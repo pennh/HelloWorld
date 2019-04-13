@@ -1,4 +1,5 @@
 node () {
+
     stage ('Git Checkout') {
         checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/pennh/HelloWorld.git']]])
     }
@@ -22,7 +23,12 @@ node () {
         } catch (Exception exc) {
             echo "Got exception: " + exc
             currentBuild.result = "SUCCESS"
-            sh "docker rm \$(docker stop \$(docker ps -q --filter ancestor=hello-world))"
+            try {
+                sh "docker rm \$(docker stop \$(docker ps -q --filter ancestor=hello-world))"
+            } catch (Exception exc2) {
+                // ignore
+                currentBuild.result = "SUCCESS"
+            }
         }
     }
 }       
